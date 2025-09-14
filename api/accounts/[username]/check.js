@@ -65,6 +65,22 @@ const accounts = [
     last_login_at: null,
     login_count: 0,
     permission_name: '基础用户'
+  },
+  {
+    id: 5,
+    username: 'zhong65161',
+    display_name: '用户zhong65161',
+    email: 'zhong65161@example.com',
+    permission_level: 2,
+    status: 1,
+    expires_at: null,
+    created_at: '2025-09-14T13:38:09.961Z',
+    updated_at: '2025-09-14T13:38:09.961Z',
+    created_by: 'api',
+    note: '通过API添加',
+    last_login_at: null,
+    login_count: 0,
+    permission_name: '高级用户'
   }
 ];
 
