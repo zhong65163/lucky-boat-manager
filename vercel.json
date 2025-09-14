@@ -6,6 +6,10 @@
       "destination": "/web/index.html"
     },
     {
+      "source": "/app.js",
+      "destination": "/web/app.js"
+    },
+    {
       "source": "/web/(.*)",
       "destination": "/web/$1"
     }
