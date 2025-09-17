@@ -1,72 +1,91 @@
 // Vercel Serverless Function - 账号管理
 
-// 内存数据存储（临时方案，Vercel重启时会重置）
-let accounts = [
-  {
-    id: 1,
-    username: 'a68668',
-    display_name: '授权用户1',
-    email: 'a68668@example.com',
-    permission_level: 3,
-    status: 1,
-    expires_at: null,
-    created_at: '2024-01-01T00:00:00.000Z',
-    updated_at: '2024-01-01T00:00:00.000Z',
-    created_by: 'system',
-    note: '主要授权账号',
-    last_login_at: null,
-    login_count: 0,
-    permission_name: '管理员'
-  },
-  {
-    id: 2,
-    username: 'qingshui888',
-    display_name: '授权用户2',
-    email: 'qingshui888@example.com',
-    permission_level: 2,
-    status: 1,
-    expires_at: null,
-    created_at: '2024-01-01T00:00:00.000Z',
-    updated_at: '2024-01-01T00:00:00.000Z',
-    created_by: 'system',
-    note: '新添加的授权账号',
-    last_login_at: null,
-    login_count: 0,
-    permission_name: '高级用户'
-  },
-  {
-    id: 3,
-    username: 'shouqi333',
-    display_name: '管理员用户',
-    email: 'shouqi333@example.com',
-    permission_level: 3,
-    status: 1,
-    expires_at: null,
-    created_at: '2024-01-01T00:00:00.000Z',
-    updated_at: '2024-01-01T00:00:00.000Z',
-    created_by: 'system',
-    note: '管理员授权账号',
-    last_login_at: null,
-    login_count: 0,
-    permission_name: '管理员'
-  },
-  {
-    id: 4,
-    username: 's639941',
-    display_name: '授权用户s639941',
-    email: 's639941@example.com',
-    permission_level: 1,
-    status: 1,
-    expires_at: null,
-    created_at: '2024-01-01T00:00:00.000Z',
-    updated_at: '2024-01-01T00:00:00.000Z',
-    created_by: 'system',
-    note: '新添加的授权账号',
-    last_login_at: null,
-    login_count: 0,
-    permission_name: '基础用户'
-  }
-];
+// 全局状态管理（在单个实例内保持一致）
+if (!global.accountsData) {
+  global.accountsData = {
+    accounts: [
+      {
+        id: 1,
+        username: 'a68668',
+        display_name: '授权用户1',
+        email: 'a68668@example.com',
+        permission_level: 3,
+        status: 1,
+        expires_at: null,
+        created_at: '2024-01-01T00:00:00.000Z',
+        updated_at: '2024-01-01T00:00:00.000Z',
+        created_by: 'system',
+        note: '主要授权账号',
+        last_login_at: null,
+        login_count: 0,
+        permission_name: '管理员'
+      },
+      {
+        id: 2,
+        username: 'qingshui888',
+        display_name: '授权用户2',
+        email: 'qingshui888@example.com',
+        permission_level: 2,
+        status: 1,
+        expires_at: null,
+        created_at: '2024-01-01T00:00:00.000Z',
+        updated_at: '2024-01-01T00:00:00.000Z',
+        created_by: 'system',
+        note: '新添加的授权账号',
+        last_login_at: null,
+        login_count: 0,
+        permission_name: '高级用户'
+      },
+      {
+        id: 3,
+        username: 'shouqi333',
+        display_name: '管理员用户',
+        email: 'shouqi333@example.com',
+        permission_level: 3,
+        status: 1,
+        expires_at: null,
+        created_at: '2024-01-01T00:00:00.000Z',
+        updated_at: '2024-01-01T00:00:00.000Z',
+        created_by: 'system',
+        note: '管理员授权账号',
+        last_login_at: null,
+        login_count: 0,
+        permission_name: '管理员'
+      },
+      {
+        id: 4,
+        username: 's639941',
+        display_name: '授权用户s639941',
+        email: 's639941@example.com',
+        permission_level: 1,
+        status: 1,
+        expires_at: null,
+        created_at: '2024-01-01T00:00:00.000Z',
+        updated_at: '2024-01-01T00:00:00.000Z',
+        created_by: 'system',
+        note: '新添加的授权账号',
+        last_login_at: null,
+        login_count: 0,
+        permission_name: '基础用户'
+      }
+    ],
+    lastModified: new Date().toISOString(),
+    instanceId: Math.random().toString(36).substring(7)
+  };
+  console.log(`🚀 初始化账号数据，实例ID: ${global.accountsData.instanceId}`);
+}
+
+// 获取当前账号数据的引用
+function getAccounts() {
+  return global.accountsData.accounts;
+}
+
+// 更新账号数据
+function updateAccounts(newAccounts, operation = 'unknown') {
+  global.accountsData.accounts = newAccounts;
+  global.accountsData.lastModified = new Date().toISOString();
+  console.log(`📝 更新账号数据 (${operation})，实例ID: ${global.accountsData.instanceId}，账号数量: ${newAccounts.length}`);
+}
 
 function setCorsHeaders(res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -87,10 +106,13 @@ export default function handler(req, res) {
     switch (method) {
       case 'GET':
         // 获取所有账号
+        const currentAccounts = getAccounts();
         return res.status(200).json({
           status: 'success',
-          data: accounts,
-          total: accounts.length
+          data: currentAccounts,
+          total: currentAccounts.length,
+          instance: global.accountsData.instanceId,
+          lastModified: global.accountsData.lastModified
         });
 
       case 'POST':
@@ -105,7 +127,8 @@ export default function handler(req, res) {
         }
 
         // 检查用户名是否已存在
-        const exists = accounts.find(acc => acc.username.toLowerCase() === username.toLowerCase());
+        const accountsForCheck = getAccounts();
+        const exists = accountsForCheck.find(acc => acc.username.toLowerCase() === username.toLowerCase());
         if (exists) {
           return res.status(409).json({
             status: 'error',
@@ -115,7 +138,7 @@ export default function handler(req, res) {
 
         // 创建新账号
         const newAccount = {
-          id: Math.max(...accounts.map(a => a.id), 0) + 1,
+          id: Math.max(...accountsForCheck.map(a => a.id), 0) + 1,
           username,
           display_name: display_name || `用户${username}`,
           email: email || `${username}@example.com`,
@@ -131,7 +154,8 @@ export default function handler(req, res) {
           permission_name: getPermissionName(permission_level || 1)
         };
 
-        accounts.push(newAccount);
+        const updatedAccounts = [...accountsForCheck, newAccount];
+        updateAccounts(updatedAccounts, 'ADD');
 
         return res.status(201).json({
           status: 'success',
@@ -150,19 +174,22 @@ export default function handler(req, res) {
           });
         }
 
-        const accountIndex = accounts.findIndex(acc => acc.id === accountId);
+        const accountsForDelete = getAccounts();
+        const accountIndex = accountsForDelete.findIndex(acc => acc.id === accountId);
 
         if (accountIndex === -1) {
           console.log(`删除失败: 账号ID ${accountId} 不存在`);
-          console.log('当前账号列表:', accounts.map(a => ({ id: a.id, username: a.username })));
+          console.log('当前账号列表:', accountsForDelete.map(a => ({ id: a.id, username: a.username })));
+          console.log(`实例ID: ${global.accountsData.instanceId}`);
           return res.status(404).json({
             status: 'error',
             message: '账号不存在'
           });
         }
 
-        const deletedAccount = accounts[accountIndex];
-        accounts.splice(accountIndex, 1);
+        const deletedAccount = accountsForDelete[accountIndex];
+        const remainingAccounts = accountsForDelete.filter((_, index) => index !== accountIndex);
+        updateAccounts(remainingAccounts, 'DELETE');
 
         console.log(`成功删除账号: ${deletedAccount.username} (ID: ${deletedAccount.id})`);
 
@@ -174,7 +201,7 @@ export default function handler(req, res) {
               id: deletedAccount.id,
               username: deletedAccount.username
             },
-            remaining_count: accounts.length
+            remaining_count: remainingAccounts.length
           }
         });
 
