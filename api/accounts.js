@@ -139,6 +139,45 @@ export default function handler(req, res) {
           data: { id: newAccount.id, username: newAccount.username }
         });
 
+      case 'DELETE':
+        // 删除账号 - 支持通过查询参数传递ID
+        const accountId = parseInt(query.id);
+
+        if (!accountId || isNaN(accountId)) {
+          return res.status(400).json({
+            status: 'error',
+            message: '请提供有效的账号ID'
+          });
+        }
+
+        const accountIndex = accounts.findIndex(acc => acc.id === accountId);
+
+        if (accountIndex === -1) {
+          console.log(`删除失败: 账号ID ${accountId} 不存在`);
+          console.log('当前账号列表:', accounts.map(a => ({ id: a.id, username: a.username })));
+          return res.status(404).json({
+            status: 'error',
+            message: '账号不存在'
+          });
+        }
+
+        const deletedAccount = accounts[accountIndex];
+        accounts.splice(accountIndex, 1);
+
+        console.log(`成功删除账号: ${deletedAccount.username} (ID: ${deletedAccount.id})`);
+
+        return res.status(200).json({
+          status: 'success',
+          message: '账号删除成功',
+          data: {
+            deleted_account: {
+              id: deletedAccount.id,
+              username: deletedAccount.username
+            },
+            remaining_count: accounts.length
+          }
+        });
+
       default:
         return res.status(405).json({
           status: 'error',
