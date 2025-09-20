@@ -10,6 +10,10 @@
       "destination": "/web/app.js"
     },
     {
+      "source": "/debug.html",
+      "destination": "/web/debug.html"
+    },
+    {
       "source": "/web/(.*)",
       "destination": "/web/$1"
     }
