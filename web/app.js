@@ -1,7 +1,7 @@
 // 账号管理系统前端脚本
 class AccountManager {
     constructor() {
-        this.baseUrl = 'https://account-manager-2024.vercel.app/api';
+        this.baseUrl = '/api';
         this.accounts = [];
         this.filteredAccounts = [];
         this.init();
