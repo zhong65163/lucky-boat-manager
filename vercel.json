@@ -14,6 +14,10 @@
       "destination": "/web/debug.html"
     },
     {
+      "source": "/test.html",
+      "destination": "/web/test.html"
+    },
+    {
       "source": "/web/(.*)",
       "destination": "/web/$1"
     }

@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>API Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background: #f0f0f0; }
+        .result { background: white; padding: 15px; margin: 10px 0; border-radius: 5px; }
+        .success { border-left: 5px solid green; }
+        .error { border-left: 5px solid red; }
+    </style>
+</head>
+<body>
+    <h1>🔧 账号管理系统 API 测试</h1>
+    <div id="results"></div>
+
+    <script>
+    const results = document.getElementById('results');
+
+    function addResult(title, content, isSuccess = true) {
+        const div = document.createElement('div');
+        div.className = `result ${isSuccess ? 'success' : 'error'}`;
+        div.innerHTML = `<h3>${title}</h3><pre>${JSON.stringify(content, null, 2)}</pre>`;
+        results.appendChild(div);
+    }
+
+    async function testAPI() {
+        try {
+            addResult('🚀 开始测试', { timestamp: new Date().toISOString() });
+
+            // 测试健康检查
+            const healthResponse = await fetch('/api/health');
+            const healthData = await healthResponse.json();
+            addResult(`✅ 健康检查 (${healthResponse.status})`, healthData);
+
+            // 测试统计数据
+            const statsResponse = await fetch('/api/statistics');
+            const statsData = await statsResponse.json();
+            addResult(`📊 统计数据 (${statsResponse.status})`, statsData);
+
+            // 测试账号列表
+            const accountsResponse = await fetch('/api/accounts');
+            const accountsData = await accountsResponse.json();
+            addResult(`👥 账号列表 (${accountsResponse.status})`, {
+                status: accountsData.status,
+                total: accountsData.total,
+                accounts: accountsData.data ? accountsData.data.length : 0,
+                first_account: accountsData.data ? accountsData.data[0] : null
+            });
+
+        } catch (error) {
+            addResult('❌ 测试失败', { error: error.message }, false);
+        }
+    }
+
+    // 立即开始测试
+    testAPI();
+    </script>
+</body>
+</html>
