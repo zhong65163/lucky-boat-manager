@@ -55,33 +55,46 @@ class AccountManager {
 
     async loadData() {
         try {
+            console.log('🚀 开始加载数据...');
             this.showLoading(true);
-            
+
+            // 测试API连接
+            console.log('📡 测试API连接:', this.baseUrl);
+
             // 并发加载统计信息和账号列表
             const [statsResponse, accountsResponse] = await Promise.all([
                 fetch(`${this.baseUrl}/statistics`),
                 fetch(`${this.baseUrl}/accounts`)
             ]);
 
+            console.log('📊 Stats response:', statsResponse.status, statsResponse.ok);
+            console.log('👥 Accounts response:', accountsResponse.status, accountsResponse.ok);
+
             if (!statsResponse.ok || !accountsResponse.ok) {
-                throw new Error('加载数据失败');
+                throw new Error(`API响应失败: stats(${statsResponse.status}) accounts(${accountsResponse.status})`);
             }
 
             const statsData = await statsResponse.json();
             const accountsData = await accountsResponse.json();
 
+            console.log('📈 Stats data:', statsData);
+            console.log('📋 Accounts data:', accountsData);
+
             if (statsData.status === 'success') {
+                console.log('✅ 更新统计数据');
                 this.updateStatistics(statsData.data);
             }
 
             if (accountsData.status === 'success') {
+                console.log(`✅ 加载 ${accountsData.data.length} 个账号`);
                 this.accounts = accountsData.data;
                 this.filteredAccounts = [...this.accounts];
                 this.renderAccountsTable();
             }
 
         } catch (error) {
-            console.error('加载数据失败:', error);
+            console.error('❌ 加载数据失败:', error);
+            alert(`🚫 数据加载失败: ${error.message}`);
             this.showError('加载数据失败，请刷新页面重试');
         } finally {
             this.showLoading(false);
